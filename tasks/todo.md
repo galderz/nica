@@ -2,7 +2,7 @@
 
 ## Phase 1: Project Skeleton & Build Infrastructure
 
-- [ ] **Task 1: Maven project skeleton with Simple submodule**
+- [x] **Task 1: Maven project skeleton with Simple submodule**
   - **Description:** Initialize the Maven project structure for `org.mendrugo.nica` targeting Java 27 with preview features enabled. Add Sea of Nodes / Simple as a Git submodule pinned to a specific commit. Configure the Maven dependency on Simple's chapter25 artifact. Create the base package structure.
   - **Acceptance criteria:**
     - [ ] `pom.xml` exists with `groupId=org.mendrugo`, `artifactId=nica`, Java 27 + `--enable-preview`
