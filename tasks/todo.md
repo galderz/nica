@@ -261,7 +261,7 @@
 
 ## Phase 5: Literal View
 
-- [ ] **Task 15: Literal Java code generator**
+- [x] **Task 15: Literal Java code generator**
   - **Description:** Given a Simple IR graph (from Task 14), generate a runnable Java source file that faithfully reproduces the computation. Each register maps to a `long` variable. SIMD registers map to `int[]` arrays. Each IR node maps to a Java statement, commented with the original assembly instruction(s) it came from. The generated class has a `main` method that takes inputs, runs the computation, and prints the result.
   - **Acceptance criteria:**
     - [ ] Generated Java compiles with `javac --enable-preview --release 27`
@@ -278,7 +278,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/codegen/LiteralJavaGenerator.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 16: Literal view end-to-end tests**
+- [x] **Task 16: Literal view end-to-end tests**
   - **Description:** End-to-end tests that parse assembly → build IR → generate Literal Java → compile → run → assert results. Tests use the three example snippets as inputs with known data. Verifies the full pipeline.
   - **Acceptance criteria:**
     - [ ] E2E test for x86 HotSpot fast-debug snippet
