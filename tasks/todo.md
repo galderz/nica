@@ -124,7 +124,7 @@
 
 ## Phase 3: Cheat Sheet View
 
-- [ ] **Task 8: Instruction description registry**
+- [x] **Task 8: Instruction description registry**
   - **Description:** Build a registry mapping instruction mnemonics to human-readable descriptions with Java-equivalent pseudocode. Covers all instructions in the three example snippets. Registry is architecture-aware (same mnemonic can have different semantics on different architectures, e.g., `add`).
   - **Acceptance criteria:**
     - [ ] Every x86_64 mnemonic in the examples has a description and Java-equivalent one-liner
@@ -139,7 +139,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/cheatsheet/InstructionDescriptions.java`, `src/test/java/org/mendrugo/nica/cheatsheet/InstructionDescriptionsTest.java`
   - **Estimated scope:** Medium
 
-- [ ] **Task 9: Cheat Sheet generator**
+- [x] **Task 9: Cheat Sheet generator**
   - **Description:** Given an `AssemblySnippet`, produce annotated assembly text with each instruction followed by a `// description` comment from the registry. Preserves original formatting, addresses, and existing comments. Adds Java-equivalent pseudocode as inline comments.
   - **Acceptance criteria:**
     - [ ] Output is the original assembly with `//` comments appended to each instruction line
