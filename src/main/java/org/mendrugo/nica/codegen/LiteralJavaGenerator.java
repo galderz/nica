@@ -39,66 +39,53 @@ public final class LiteralJavaGenerator {
         var sb = new StringBuilder();
         emitHeader(sb, className, snippet);
 
-        // Emit run method signature
+        // Collect input registers: vmovq memory loads + vpmovsxbd sources not loaded by vmovq
+        var inputRegs = new java.util.LinkedHashSet<String>();
+        var writtenRegs = new java.util.HashSet<String>();
+        for (var insn : snippet.instructions()) {
+            if (insn.mnemonic().equals("vmovq") && insn.operands().getFirst() instanceof Operand.Memory) {
+                String dst = regName(insn.operands().get(1));
+                inputRegs.add(dst);
+                writtenRegs.add(dst);
+            } else if (insn.mnemonic().equals("vpmovsxbd")) {
+                String src = regName(insn.operands().get(0));
+                if (!writtenRegs.contains(src)) inputRegs.add(src);
+            }
+        }
+        var inputRegList = inputRegs.stream().toList();
+
+        // Emit run method signature — input registers are parameters
         sb.append("    /**\n");
         sb.append("     * Execute the assembly computation.\n");
         sb.append("     * SIMD registers are modeled as int[8] (256-bit AVX2 ymm).\n");
         sb.append("     * Each int holds a 32-bit lane value.\n");
         sb.append("     */\n");
-        sb.append("    public static int[] run(int[] xmm0_bytes, int[] xmm1_bytes");
-
-        // Collect all xmm source registers from vmovq memory loads
-        var loadRegs = snippet.instructions().stream()
-            .filter(i -> i.mnemonic().equals("vmovq")
-                && i.operands().getFirst() instanceof Operand.Memory)
-            .map(i -> ((Operand.Register) i.operands().get(1)).name())
-            .distinct()
-            .toList();
-
-        // If more than 2 input registers, add extra parameters
-        for (int i = 2; i < loadRegs.size(); i++) {
-            sb.append(", int[] ").append(loadRegs.get(i)).append("_bytes");
+        sb.append("    public static int[] run(");
+        for (int i = 0; i < inputRegList.size(); i++) {
+            if (i > 0) sb.append(", ");
+            sb.append("int[] ").append(sanitize(inputRegList.get(i)));
         }
         sb.append(") {\n");
 
-        // Emit register declarations for all xmm/ymm registers used
+        // Emit register declarations for all non-input SIMD registers
         var allRegs = collectSimdRegisters(snippet);
         for (var reg : allRegs) {
-            sb.append("        int[] ").append(sanitize(reg)).append(" = new int[8];\n");
+            if (!inputRegs.contains(reg)) {
+                sb.append("        int[] ").append(sanitize(reg)).append(" = new int[8];\n");
+            }
         }
         sb.append('\n');
-
-        // Map input parameters to registers
-        for (int i = 0; i < Math.min(loadRegs.size(), 2); i++) {
-            sb.append("        // Input: ").append(loadRegs.get(i)).append(" loaded from memory\n");
-            sb.append("        System.arraycopy(");
-            sb.append(i == 0 ? "xmm0_bytes" : "xmm1_bytes");
-            sb.append(", 0, ").append(sanitize(loadRegs.get(i))).append(", 0, 8);\n");
-        }
-        sb.append('\n');
-
-        // Track which vmovq load we've seen (to map to input params)
-        int loadIndex = 0;
 
         // Emit each instruction
         for (var insn : snippet.instructions()) {
             switch (insn.mnemonic()) {
                 case "vmovq" -> {
+                    emitComment(sb, insn);
                     if (insn.operands().getFirst() instanceof Operand.Memory) {
-                        String dst = regName(insn.operands().get(1));
-                        if (loadIndex >= 2 && loadIndex < loadRegs.size()) {
-                            emitComment(sb, insn);
-                            sb.append("        System.arraycopy(")
-                              .append(loadRegs.get(loadIndex)).append("_bytes, 0, ")
-                              .append(sanitize(dst)).append(", 0, 8);\n");
-                        } else if (loadIndex < 2) {
-                            emitComment(sb, insn);
-                            sb.append("        // (already loaded from parameter)\n");
-                        }
-                        loadIndex++;
+                        // Memory load — register is already a parameter
+                        sb.append("        // (loaded from parameter)\n");
                     } else {
                         // Register-to-register vmovq
-                        emitComment(sb, insn);
                         String src = regName(insn.operands().get(0));
                         String dst = regName(insn.operands().get(1));
                         sb.append("        System.arraycopy(")
@@ -138,7 +125,7 @@ public final class LiteralJavaGenerator {
         sb.append("        return ").append(sanitize(resultReg)).append(";\n");
         sb.append("    }\n");
 
-        emitMainMethod(sb, className);
+        emitMainMethod(sb, className, inputRegList);
         sb.append("}\n");
         return sb.toString();
     }
@@ -263,7 +250,7 @@ public final class LiteralJavaGenerator {
         sb.append("        return ").append(sanitize(resultReg)).append(";\n");
         sb.append("    }\n");
 
-        emitMainMethod(sb, className);
+        emitMainMethod(sb, className, loadRegs);
         sb.append("}\n");
         return sb.toString();
     }
@@ -331,13 +318,22 @@ public final class LiteralJavaGenerator {
           .append(sanitize(src.name())).append("[i] ").append(op).append(' ').append(shift).append(";\n");
     }
 
-    private static void emitMainMethod(StringBuilder sb, String className) {
+    private static void emitMainMethod(StringBuilder sb, String className, List<String> inputRegs) {
         sb.append('\n');
         sb.append("    public static void main(String[] args) {\n");
         sb.append("        // Example: run with sample input data\n");
-        sb.append("        int[] a = {1, 255, 127, 128, 0, 2, 254, 64}; // unsigned bytes\n");
-        sb.append("        int[] b = {10, 20, 30, 40, 50, 60, 70, 80};\n");
-        sb.append("        int[] result = run(a, b);\n");
+        for (int i = 0; i < inputRegs.size(); i++) {
+            sb.append("        int[] ").append(sanitize(inputRegs.get(i))).append("_in = ");
+            if (i % 2 == 0) sb.append("{1, 255, 127, 128, 0, 2, 254, 64};");
+            else sb.append("{10, 20, 30, 40, 50, 60, 70, 80};");
+            sb.append("\n");
+        }
+        sb.append("        int[] result = run(");
+        for (int i = 0; i < inputRegs.size(); i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(sanitize(inputRegs.get(i))).append("_in");
+        }
+        sb.append(");\n");
         sb.append("        System.out.print(\"Result: [\");\n");
         sb.append("        for (int i = 0; i < result.length; i++) {\n");
         sb.append("            if (i > 0) System.out.print(\", \");\n");
