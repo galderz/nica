@@ -89,20 +89,39 @@ Correct:  (value << 1) with 32-bit truncation afterward
 
 ## Proper Fix for Nica (Future Work)
 
-The correct approach is to model 32-bit lane semantics explicitly:
+The current `+32` hardcoding should be replaced with Simple's own approach:
+use `Long.numberOfLeadingZeros(dst._max) - 1` to compute the correct shift
+amount for any target width dynamically. This is what `ConvertNode.idealize()`
+does (chapter 25), and Nica should adopt the same pattern instead of
+hardcoding an offset.
+
+For byte sign-extension (`vpmovsxbd`, `sshll .8b`):
+```java
+// Instead of hardcoding 56:
+int shift = Long.numberOfLeadingZeros(TypeInteger.I8._max) - 1; // = 56
+```
+
+For halfword sign-extension (`sshll .4h`):
+```java
+int shift = Long.numberOfLeadingZeros(TypeInteger.I16._max) - 1; // = 48
+```
+
+Beyond sign-extension, the correct approach is to model 32-bit lane semantics
+explicitly:
 
 **Option A: Truncate after each operation**
 
-After every SIMD arithmetic operation, insert a truncation:
-```
-result = (result << 32) >> 32  // sign-extend from bit 31
-```
-Or equivalently in Simple IR:
-```
-SarNode(ShlNode(result, #32), #32)
+After every SIMD arithmetic operation, insert a truncation to 32-bit using
+the same `ConvertNode` idiom:
+```java
+// Truncate to signed 32-bit:
+int shift = Long.numberOfLeadingZeros(TypeInteger.I32._max) - 1; // = 32
+SarNode(ShlNode(result, #shift), #shift)
 ```
 
-This matches Simple's `ConvertNode` pattern for narrowing to `I32`.
+This is the canonical Simple pattern. It ensures that intermediate SIMD
+results stay within 32-bit range, making subsequent shifts and overflows
+behave identically to the assembly's 32-bit lane semantics.
 
 **Option B: Use TypeInteger.I32 type annotations**
 
