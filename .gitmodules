@@ -1,0 +1,3 @@
+[submodule "lib/simple"]
+	path = lib/simple
+	url = https://github.com/SeaOfNodes/Simple.git
