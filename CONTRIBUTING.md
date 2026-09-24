@@ -28,28 +28,29 @@ git submodule update --init --recursive
 ### 2. Build Simple locally
 
 Simple's chapters all share the same Maven artifactId, so you cannot build
-from the root POM. Instead, install the parent POM first, then build chapter25
-(which contains the full IR we depend on):
+from the root POM. Instead, install the parent POM first, then build chapter14
+(which contains the IR nodes Nica depends on):
 
 ```bash
 # Install the parent POM (no code, just the POM itself)
 cd lib/simple
 mvn install -DskipTests -N
 
-# Build and install chapter25
-cd chapter25
+# Build and install chapter14
+cd chapter14
 mvn install -DskipTests
 
 # Return to the Nica root
 cd ../../..
 ```
 
-After this, `com.seaofnodes:chapter23:1.0` is in your local Maven repository
-(`~/.m2/repository/com/seaofnodes/chapter23/`).
+After this, `com.seaofnodes:chapter14:1.0` is in your local Maven repository
+(`~/.m2/repository/com/seaofnodes/chapter14/`).
 
-> **Why `chapter23`?** Simple's chapter25 directory reuses the `chapter23`
-> artifactId in its POM. This is an upstream naming choice; Nica depends on
-> the artifact as-is.
+> **Why chapter14?** It's the earliest chapter with all the node types Nica
+> needs (Add, Mul, Xor, Shl, Sar, Load, If, Loop, Bool, Constant) plus
+> IRPrinter for debugging — without the heavy CodeGen machinery of later
+> chapters.
 
 ### 3. Build and test Nica
 
@@ -75,7 +76,7 @@ mvn test -Dtest=FooTest   # Run a specific test class
 If you update the Simple submodule (see below), rebuild it:
 
 ```bash
-cd lib/simple/chapter25
+cd lib/simple/chapter14
 mvn install -DskipTests
 cd ../../..
 mvn compile   # Verify Nica still compiles against the new Simple
@@ -147,17 +148,17 @@ You need to install Simple's parent POM:
 cd lib/simple && mvn install -DskipTests -N && cd ../..
 ```
 
-**Problem: `mvn compile` fails with "Could not find artifact com.seaofnodes:chapter23:jar:1.0"**
+**Problem: `mvn compile` fails with "Could not find artifact com.seaofnodes:chapter14:jar:1.0"**
 
-You need to build chapter25:
+You need to build chapter14:
 ```bash
-cd lib/simple/chapter25 && mvn install -DskipTests && cd ../../..
+cd lib/simple/chapter14 && mvn install -DskipTests && cd ../../..
 ```
 
 **Problem: "DuplicateProjectException" when building Simple from root**
 
 This is expected — all Simple chapters share the same artifactId. Always build
-from `lib/simple/chapter25/`, never from `lib/simple/`.
+from `lib/simple/chapter14/`, never from `lib/simple/`.
 
 **Problem: submodule shows as "modified" in `git status` but you didn't change it**
 

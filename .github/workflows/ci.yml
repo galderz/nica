@@ -27,9 +27,9 @@ jobs:
         run: mvn install -DskipTests -N -q
         working-directory: lib/simple
 
-      - name: Build Simple (chapter25)
+      - name: Build Simple (chapter14)
         run: mvn install -DskipTests -q
-        working-directory: lib/simple/chapter25
+        working-directory: lib/simple/chapter14
 
       - name: Build and test Nica
         run: mvn verify

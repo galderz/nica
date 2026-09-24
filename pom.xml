@@ -19,10 +19,10 @@
     </properties>
 
     <dependencies>
-        <!-- Sea of Nodes / Simple IR (chapter25, locally built) -->
+        <!-- Sea of Nodes / Simple IR (chapter14, locally built) -->
         <dependency>
             <groupId>com.seaofnodes</groupId>
-            <artifactId>chapter23</artifactId>
+            <artifactId>chapter14</artifactId>
             <version>1.0</version>
         </dependency>
 
