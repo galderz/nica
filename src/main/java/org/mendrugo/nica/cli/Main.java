@@ -48,7 +48,7 @@ public final class Main {
      *
      * @return 0 on success, non-zero on error
      */
-    static int run(String[] args, PrintStream out, PrintStream err) {
+    public static int run(String[] args, PrintStream out, PrintStream err) {
         // Parse arguments
         String inputFile = null;
         View view = View.LITERAL;
