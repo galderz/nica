@@ -158,7 +158,145 @@ class HotSpotDebugParserTest {
         assertEquals("ebp", ((Operand.Register) operands.get(1)).name());
     }
 
+    // --- aarch64 tests ---
+
+    @Test
+    void parsesAArch64InstructionCount() throws IOException {
+        var snippet = parseAArch64Resource();
+        assertEquals(65, snippet.instructions().size());
+    }
+
+    @Test
+    void parsesAArch64BlockHeader() throws IOException {
+        var snippet = parseAArch64Resource();
+        assertNotNull(snippet.blockInfo());
+        assertTrue(snippet.blockInfo().startsWith("B22:"));
+        assertTrue(snippet.blockInfo().contains("N37"));
+    }
+
+    @Test
+    void parsesAArch64ScalarRegisters() throws IOException {
+        var snippet = parseAArch64Resource();
+        // sxtw x12, w17
+        var first = snippet.instructions().getFirst();
+        assertEquals("sxtw", first.mnemonic());
+        assertEquals(2, first.operands().size());
+        assertEquals("x12", ((Operand.Register) first.operands().get(0)).name());
+        assertEquals("w17", ((Operand.Register) first.operands().get(1)).name());
+        assertFalse(((Operand.Register) first.operands().get(0)).isVector());
+    }
+
+    @Test
+    void parsesAArch64MemoryOperand() throws IOException {
+        var snippet = parseAArch64Resource();
+        // ldr s21, [x14, #0x10]
+        var ldr = snippet.instructions().stream()
+            .filter(i -> i.mnemonic().equals("ldr"))
+            .findFirst().orElseThrow();
+        assertEquals(2, ldr.operands().size());
+        assertEquals("s21", ((Operand.Register) ldr.operands().get(0)).name());
+        var mem = assertInstanceOf(Operand.Memory.class, ldr.operands().get(1));
+        assertEquals("x14", mem.base());
+        assertEquals(0x10, mem.displacement());
+    }
+
+    @Test
+    void parsesAArch64VectorSshll() throws IOException {
+        var snippet = parseAArch64Resource();
+        // sshll v26.8h, v26.8b, #0
+        var sshll = snippet.instructions().stream()
+            .filter(i -> i.mnemonic().equals("sshll"))
+            .findFirst().orElseThrow();
+        assertEquals(3, sshll.operands().size());
+        var dst = assertInstanceOf(Operand.Register.class, sshll.operands().get(0));
+        assertEquals("v26", dst.name());
+        assertEquals("8h", dst.arrangement());
+        assertTrue(dst.isVector());
+        var src = assertInstanceOf(Operand.Register.class, sshll.operands().get(1));
+        assertEquals("v26", src.name());
+        assertEquals("8b", src.arrangement());
+        var imm = assertInstanceOf(Operand.Immediate.class, sshll.operands().get(2));
+        assertEquals(0, imm.value());
+    }
+
+    @Test
+    void parsesAArch64Eor3FourOperands() throws IOException {
+        var snippet = parseAArch64Resource();
+        var eor3 = snippet.instructions().stream()
+            .filter(i -> i.mnemonic().equals("eor3"))
+            .findFirst().orElseThrow();
+        assertEquals(4, eor3.operands().size());
+        for (var op : eor3.operands()) {
+            var reg = assertInstanceOf(Operand.Register.class, op);
+            assertTrue(reg.isVector());
+            assertEquals("16b", reg.arrangement());
+        }
+    }
+
+    @Test
+    void parsesAArch64AddWithImmediate() throws IOException {
+        var snippet = parseAArch64Resource();
+        // add w14, w17, #0x10
+        var add = snippet.instructions().stream()
+            .filter(i -> i.mnemonic().equals("add")
+                && i.operands().size() == 3
+                && i.operands().getLast() instanceof Operand.Immediate)
+            .findFirst().orElseThrow();
+        assertEquals("w14", ((Operand.Register) add.operands().get(0)).name());
+        assertEquals("w17", ((Operand.Register) add.operands().get(1)).name());
+        assertEquals(0x10, ((Operand.Immediate) add.operands().get(2)).value());
+    }
+
+    @Test
+    void parsesAArch64ConditionalBranch() throws IOException {
+        var snippet = parseAArch64Resource();
+        // b.lt #0x111e01070
+        var blt = snippet.instructions().stream()
+            .filter(i -> i.mnemonic().equals("b.lt"))
+            .findFirst().orElseThrow();
+        assertEquals(1, blt.operands().size());
+        var addr = assertInstanceOf(Operand.Address.class, blt.operands().get(0));
+        assertEquals(0x111e01070L, addr.address());
+    }
+
+    @Test
+    void parsesAArch64SourceAnnotation() throws IOException {
+        var snippet = parseAArch64Resource();
+        // b.lt has annotation: TestXorByte::testByte@9 (line 20)
+        var blt = snippet.instructions().stream()
+            .filter(i -> i.mnemonic().equals("b.lt"))
+            .findFirst().orElseThrow();
+        assertNotNull(blt.annotation());
+        assertEquals("TestXorByte", blt.annotation().className());
+        assertEquals("testByte", blt.annotation().methodName());
+        assertEquals(9, blt.annotation().bci());
+        assertEquals(20, blt.annotation().lineNumber());
+    }
+
+    @Test
+    void parsesAArch64Cmp() throws IOException {
+        var snippet = parseAArch64Resource();
+        // cmp w14, w13
+        var cmp = snippet.instructions().stream()
+            .filter(i -> i.mnemonic().equals("cmp"))
+            .findFirst().orElseThrow();
+        assertEquals(2, cmp.operands().size());
+        assertEquals("w14", ((Operand.Register) cmp.operands().get(0)).name());
+        assertEquals("w13", ((Operand.Register) cmp.operands().get(1)).name());
+    }
+
+    @Test
+    void aarch64ArchitectureIsSet() throws IOException {
+        var snippet = parseAArch64Resource();
+        assertEquals(Architecture.AARCH64, snippet.architecture());
+    }
+
     // --- Helper ---
+
+    private AssemblySnippet parseAArch64Resource() throws IOException {
+        String text = loadResource("hotspot-debug-aarch64.asm");
+        return HotSpotDebugParser.parse(text, Architecture.AARCH64);
+    }
 
     private AssemblySnippet parseX86Resource() throws IOException {
         String text = loadResource("hotspot-debug-x86.asm");

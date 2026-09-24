@@ -77,9 +77,11 @@ public final class HotSpotDebugParser {
                     annotation = lookAheadForAnnotation(lines, i + 1);
                 }
 
+                boolean isBranch = mnemonic.startsWith("b.") || mnemonic.equals("b")
+                    || mnemonic.equals("bl") || mnemonic.equals("cbz") || mnemonic.equals("cbnz");
                 List<Operand> operands = switch (architecture) {
                     case X86_64 -> parseX86Operands(operandsText);
-                    case AARCH64 -> parseAArch64Operands(operandsText);
+                    case AARCH64 -> parseAArch64Operands(operandsText, isBranch);
                 };
 
                 instructions.add(new Instruction(address, mnemonic, operands, line.strip(), annotation));
@@ -186,21 +188,29 @@ public final class HotSpotDebugParser {
     );
 
     static List<Operand> parseAArch64Operands(String text) {
+        return parseAArch64Operands(text, false);
+    }
+
+    static List<Operand> parseAArch64Operands(String text, boolean isBranch) {
         if (text.isEmpty()) return List.of();
 
         var operands = new ArrayList<Operand>();
         for (String part : splitOperands(text)) {
             part = part.strip();
             if (part.isEmpty()) continue;
-            operands.add(parseAArch64Operand(part));
+            operands.add(parseAArch64Operand(part, isBranch));
         }
         return List.copyOf(operands);
     }
 
-    private static Operand parseAArch64Operand(String text) {
-        // Immediate: #0x10 or #0
+    private static Operand parseAArch64Operand(String text, boolean isBranch) {
+        // #value: could be an immediate or a branch target address
         if (text.startsWith("#")) {
-            return new Operand.Immediate(parseLong(text.substring(1)));
+            long value = parseLong(text.substring(1));
+            if (isBranch) {
+                return new Operand.Address(value);
+            }
+            return new Operand.Immediate(value);
         }
 
         // Memory reference: [base, #disp]
