@@ -162,7 +162,7 @@
 
 ## Phase 4: Instruction Semantics & Simple IR
 
-- [ ] **Task 10: Instruction semantics — scalar x86_64**
+- [x] **Task 10: Instruction semantics — scalar x86_64**
   - **Description:** Implement the runtime semantics of scalar x86_64 instructions: `movq`, `movl`, `leaq`, `leal`, `addq`, `cmpl`, `cmpq`, `testl`, `jl`, `jle`, `jbe`, `je`, `nop`, `retq`, `callq`. Each instruction is a function that takes a machine state (registers + memory) and mutates it. Register writes follow Option B conventions (one `long` per physical register, 32-bit writes zero-extend).
   - **Acceptance criteria:**
     - [ ] Each scalar x86_64 instruction has a semantic implementation
@@ -180,7 +180,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/semantics/x86/ScalarX86Semantics.java`, `src/main/java/org/mendrugo/nica/semantics/MachineState.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 11: Instruction semantics — SIMD x86_64**
+- [x] **Task 11: Instruction semantics — SIMD x86_64**
   - **Description:** Implement the runtime semantics of AVX2 SIMD x86_64 instructions: `vmovq`, `vpmovsxbd`, `vpmulld`, `vpaddd`, `vpslld`, `vpsrad`, `vpxor`. SIMD registers (`ymm*`) are modeled as `int[8]` (256-bit, 8 packed ints). `xmm*` registers are `long` (64-bit, for `vmovq` loads).
   - **Acceptance criteria:**
     - [ ] `vmovq` loads 8 bytes from memory into an xmm register (as `long`)
@@ -200,7 +200,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/semantics/x86/SimdX86Semantics.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 12: Instruction semantics — scalar aarch64**
+- [x] **Task 12: Instruction semantics — scalar aarch64**
   - **Description:** Implement the runtime semantics of scalar aarch64 instructions: `sxtw`, `add` (register form), `ldr` (single-precision float register used as 32-bit load), `cmp`, `b.lt`. Register model: `x0`-`x30` as `long`, `w0`-`w30` as lower 32 bits (writes zero-extend, same as x86 convention).
   - **Acceptance criteria:**
     - [ ] `sxtw` sign-extends a 32-bit value in `wN` to 64-bit in `xN`
@@ -216,7 +216,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/semantics/aarch64/ScalarAArch64Semantics.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 13: Instruction semantics — SIMD aarch64**
+- [x] **Task 13: Instruction semantics — SIMD aarch64**
   - **Description:** Implement the runtime semantics of NEON SIMD aarch64 instructions: `sshll` (signed shift left long), `mul` (vector), `mla` (vector multiply-accumulate), `shl` (vector shift left), `sshr` (vector signed shift right), `eor3` (three-way XOR). Vector registers use arrangement specifiers (`.8b`, `.8h`, `.4s`, `.16b`).
   - **Acceptance criteria:**
     - [ ] `sshll v26.8h, v26.8b, #0` sign-extends 8 bytes to 8 halfwords
@@ -234,7 +234,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/semantics/aarch64/SimdAArch64Semantics.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 14: Simple IR graph builder**
+- [x] **Task 14: Simple IR graph builder**
   - **Description:** Translate a parsed `AssemblySnippet` with resolved instruction semantics into a Simple IR graph (Sea of Nodes). Each instruction produces one or more Simple nodes. SIMD instructions expand into N scalar nodes (e.g., `vpaddd ymm` → 8 `AddNode`). Memory loads become `LoadNode` (or a simplified equivalent since we don't have full Simple memory alias tracking — may need a lightweight wrapper). Control flow (`cmp`/`jl`) becomes `IfNode` + `LoopNode`. Use Simple's `IRPrinter` to dump graphs for debugging.
   - **Acceptance criteria:**
     - [ ] x86 HotSpot example snippet builds a valid Simple IR graph
