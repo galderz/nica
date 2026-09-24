@@ -31,7 +31,7 @@
   - **Files likely touched:** `.github/workflows/ci.yml`
   - **Estimated scope:** Small
 
-- [ ] **Task 3: Contribution guide (Git submodule workflow)**
+- [x] **Task 3: Contribution guide (Git submodule workflow)**
   - **Description:** Write `CONTRIBUTING.md` documenting the full developer workflow: cloning with submodules, building Simple locally, building and testing Nica, updating the Simple submodule pin, and common troubleshooting (stale submodule, build failures). Target audience: developers who haven't used Git submodules extensively.
   - **Acceptance criteria:**
     - [ ] `CONTRIBUTING.md` exists with step-by-step clone-to-test instructions
