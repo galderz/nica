@@ -17,7 +17,7 @@
   - **Files likely touched:** `pom.xml`, `.gitmodules`, `src/main/java/org/mendrugo/nica/Nica.java`
   - **Estimated scope:** Small
 
-- [ ] **Task 2: GitHub Actions CI**
+- [x] **Task 2: GitHub Actions CI**
   - **Description:** Create a GitHub Actions workflow that checks out the repo with submodules, sets up Java 27, builds Simple, then builds and tests Nica. Cache Simple's Maven artifacts to speed up subsequent runs.
   - **Acceptance criteria:**
     - [ ] `.github/workflows/ci.yml` exists
