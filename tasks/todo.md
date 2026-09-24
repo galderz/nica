@@ -53,7 +53,7 @@
 
 ## Phase 2: Assembly Parsing
 
-- [ ] **Task 4: Assembly instruction model**
+- [x] **Task 4: Assembly instruction model**
   - **Description:** Define the internal representation for parsed assembly instructions. This is the common model that all parsers produce and all downstream stages consume. Includes: instruction address, mnemonic, operands (register, immediate, memory reference), original text, source annotations (Java class/method/line from JIT comments), and architecture tag (x86_64 / aarch64).
   - **Acceptance criteria:**
     - [ ] `Instruction` record (or sealed hierarchy) captures mnemonic, operands, address, original text, annotations
@@ -67,7 +67,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/asm/Instruction.java`, `src/main/java/org/mendrugo/nica/asm/Operand.java`, `src/main/java/org/mendrugo/nica/asm/AssemblySnippet.java`, `src/main/java/org/mendrugo/nica/asm/Architecture.java`
   - **Estimated scope:** Small
 
-- [ ] **Task 5: HotSpot fast-debug parser (x86_64)**
+- [x] **Task 5: HotSpot fast-debug parser (x86_64)**
   - **Description:** Parse HotSpot fast-debug disassembly output for x86_64 into the instruction model. Handles AT&T syntax (mnemonic + operands), block header comments (`;; B22: ...`), and source annotations (`; - TestXorByte::testByte@9 (line 20)`). Input is the x86_64 example snippet from the spec.
   - **Acceptance criteria:**
     - [ ] Parses the full x86_64 HotSpot fast-debug example snippet
@@ -83,7 +83,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/parser/HotSpotDebugParser.java`, `src/test/java/org/mendrugo/nica/parser/HotSpotDebugParserTest.java`, `src/test/resources/hotspot-debug-x86.asm`
   - **Estimated scope:** Medium
 
-- [ ] **Task 6: HotSpot fast-debug parser (aarch64)**
+- [x] **Task 6: HotSpot fast-debug parser (aarch64)**
   - **Description:** Extend the HotSpot fast-debug parser to handle aarch64 syntax. Key differences: no AT&T `%` prefix on registers, different operand syntax (e.g., `[x14, #0x10]` vs `0x10(%rsi)`), condition suffixes on branches (e.g., `b.lt`), and NEON vector register notation (`v26.8h`, `v26.4s`).
   - **Acceptance criteria:**
     - [ ] Parses the full aarch64 HotSpot fast-debug example snippet
@@ -98,7 +98,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/parser/HotSpotDebugParser.java` (extend), `src/test/java/org/mendrugo/nica/parser/HotSpotDebugParserTest.java`, `src/test/resources/hotspot-debug-aarch64.asm`
   - **Estimated scope:** Medium
 
-- [ ] **Task 7: Perf annotate parser (x86_64)**
+- [x] **Task 7: Perf annotate parser (x86_64)**
   - **Description:** Parse `perf annotate` output format for GraalVM native image. Key differences from HotSpot debug: percentage column on the left, arrow symbols (`→`, `↓`, `↑`, `←`) for branches, method signature as header, label targets as names (e.g., `43:`, `48:`), and Intel syntax (no `%` prefix, destination before source).
   - **Acceptance criteria:**
     - [ ] Parses the full GraalVM perf-annotate example snippet
