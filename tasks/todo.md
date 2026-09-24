@@ -301,7 +301,7 @@
 
 ## Phase 6: Explained View
 
-- [ ] **Task 17: Pattern matcher framework**
+- [x] **Task 17: Pattern matcher framework**
   - **Description:** Build the pattern matching infrastructure for recognizing IR graph patterns. A `Recipe` is a named pattern that matches a subgraph of Simple IR nodes and produces a high-level Java code fragment. Uses Java 27 `switch` pattern matching with guards over Simple's Node class hierarchy. The framework walks the IR graph, tries each recipe, and returns matches with the matched subgraph marked.
   - **Acceptance criteria:**
     - [ ] `Recipe` interface: `Optional<Match> match(Node root)`
@@ -317,7 +317,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/recipe/Recipe.java`, `src/main/java/org/mendrugo/nica/recipe/Match.java`, `src/main/java/org/mendrugo/nica/recipe/PatternMatcher.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 18: Recipe — vectorized sign-extend + multiply-accumulate**
+- [x] **Task 18: Recipe — vectorized sign-extend + multiply-accumulate**
   - **Description:** Recognize the pattern: N `ConvertNode`s (sign-extend) feeding into `MulNode`s and `AddNode`s, where the structure indicates a vectorized multiply-accumulate over byte arrays. Emit readable Java: `for (int i = 0; i < N; i++) result[i] = a[i] * b[i] + c[i];`
   - **Acceptance criteria:**
     - [ ] Pattern matches the inner multiply-accumulate block of the x86 and aarch64 examples
@@ -331,7 +331,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/recipe/MultiplyAccumulateRecipe.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 19: Recipe — shift-mask-xor-reduce**
+- [x] **Task 19: Recipe — shift-mask-xor-reduce**
   - **Description:** Recognize the pattern: `ShlNode` → `SarNode` (same shift amount = sign-extension/truncation) followed by chained `XorNode`s (accumulating XOR across multiple results). Emit readable Java: `result ^= truncateToSignedByte(value);`
   - **Acceptance criteria:**
     - [ ] Pattern matches the xor-reduce tail of the x86 and aarch64 examples
@@ -344,7 +344,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/recipe/ShiftMaskXorReduceRecipe.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 20: Recipe — array bounds check with exception (GraalVM)**
+- [x] **Task 20: Recipe — array bounds check with exception (GraalVM)**
   - **Description:** Recognize the GraalVM native image pattern: null check (`testl`/`je` → `throwNewNullPointerException`), bounds check (`cmpl`/`jb` → `outOfBoundsCheckIndex`), and the happy path (load and return). Emit readable Java: `Objects.checkIndex(index, length); return array[index];` with clear comments about the guard structure.
   - **Acceptance criteria:**
     - [ ] Pattern matches the GraalVM perf-annotate example structure
@@ -357,7 +357,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/recipe/BoundsCheckRecipe.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 21: Explained Java code generator**
+- [x] **Task 21: Explained Java code generator**
   - **Description:** Given a Simple IR graph and a set of pattern matches, generate a runnable Java source file that uses recipe-generated code for matched regions and falls back to literal translation for unmatched regions. The output should be significantly more readable than the Literal view.
   - **Acceptance criteria:**
     - [ ] Matched regions use recipe-generated high-level Java
@@ -372,7 +372,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/codegen/ExplainedJavaGenerator.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 22: Literal ↔ Explained equivalence tests**
+- [x] **Task 22: Literal ↔ Explained equivalence tests**
   - **Description:** For each example snippet, generate both Literal and Explained Java, compile and run both with the same inputs, and assert they produce identical outputs. This is the core correctness guarantee: the Explained view is a *readable* version of the Literal view, not a different computation.
   - **Acceptance criteria:**
     - [ ] Equivalence test for x86 HotSpot example
