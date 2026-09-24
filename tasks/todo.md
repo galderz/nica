@@ -395,7 +395,7 @@
 
 ## Phase 7: CLI & Polish
 
-- [ ] **Task 23: CLI entry point with argument parsing**
+- [x] **Task 23: CLI entry point with argument parsing**
   - **Description:** Build the `nica` CLI entry point. Accepts an assembly file, optional `--source` Java file with `--lines` range, and `--view` flag (`cheat-sheet`, `literal`, `explained`, default `literal`). Auto-detects the assembly format (HotSpot debug vs perf annotate) from file content. Outputs generated Java to stdout or a specified file.
   - **Acceptance criteria:**
     - [ ] `nica input.asm` produces Literal view to stdout
@@ -414,7 +414,7 @@
   - **Files likely touched:** `src/main/java/org/mendrugo/nica/cli/Main.java`, tests
   - **Estimated scope:** Medium
 
-- [ ] **Task 24: End-to-end integration tests & README**
+- [x] **Task 24: End-to-end integration tests & README**
   - **Description:** Full integration tests exercising the CLI with all three example snippets and all three views (9 combinations). Update README with usage instructions, example output, the verification story (three approaches), and links to the idea document.
   - **Acceptance criteria:**
     - [ ] 9 integration tests (3 snippets × 3 views) all pass
