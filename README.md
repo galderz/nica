@@ -86,10 +86,12 @@ for (int i = 0; i < 8; i++) {
 
 ## Supported Formats
 
-| Format | Architecture | Source |
-|--------|-------------|--------|
-| HotSpot fast-debug disassembly | x86_64, aarch64 | `PrintAssembly` with capstone |
-| `perf annotate` output | x86_64 | GraalVM native image |
+| Format | Architecture | Syntax | Source |
+|--------|-------------|--------|--------|
+| HotSpot fast-debug disassembly | x86_64, aarch64 | AT&T | `PrintAssembly` with capstone |
+| `perf annotate` output | x86_64 | AT&T | GraalVM native image |
+
+> **Note:** Only AT&T syntax is supported for x86\_64 assembly. Intel syntax (used by some disassemblers and debuggers) is not supported. AT&T syntax is the default output format for HotSpot's `PrintAssembly` and `perf annotate`, so no configuration is typically needed.
 
 ## Recognized Patterns
 

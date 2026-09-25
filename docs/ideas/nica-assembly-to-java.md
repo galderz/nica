@@ -47,9 +47,11 @@ Simple has no published Maven artifacts. It will be built locally as a dependenc
 
 **In:**
 
-- **Assembly parser** supporting two input formats (a third will come later):
-  - HotSpot fast-debug disassembly (x86_64 and aarch64) — provided in examples
-  - `perf annotate` output (x86_64, from GraalVM native image) — provided in examples
+- **Assembly parser** supporting two input formats (a third will come later).
+  Only AT&T syntax is supported for x86_64; Intel syntax is not supported.
+  AT&T is the default output of HotSpot's `PrintAssembly` and `perf annotate`.
+  - HotSpot fast-debug disassembly (x86_64 AT&T and aarch64) — provided in examples
+  - `perf annotate` output (x86_64 AT&T, from GraalVM native image) — provided in examples
   - *(Future: HotSpot release build capstone disassembly — no examples yet, deferred)*
 - **Instruction semantics** for only the instructions appearing in the three example snippets:
   - x86_64: `vmovq`, `vpmovsxbd`, `vpmulld`, `vpaddd`, `vpslld`, `vpsrad`, `vpxor`, `leal`, `cmpl`, `jl`, `leaq`, `cmpq`, `jbe`, `movq`, `movl`, `nop`, `testl`, `je`, `addq`, `retq`, `jle`, `callq`
@@ -88,6 +90,8 @@ Simple has no published Maven artifacts. It will be built locally as a dependenc
 - **GraphViewer integration** — Simple's web-based graph viewer is powerful for debugging IR construction, and Nica should adopt Simple's `IRPrinter` for textual debugging. But wiring up the WebSocket-based GraphViewer is polish, not core.
 
 - **Floating-point instructions** — The example snippets are integer/byte arithmetic. FP support (SSE/AVX scalar, NEON FP) is a natural extension but not needed for MVP validation.
+
+- **Intel syntax for x86_64** — Only AT&T syntax is supported. Both HotSpot `PrintAssembly` and `perf annotate` default to AT&T, so there is no immediate need. Supporting Intel syntax would require a separate operand parser (destination-first operand order, no `%`/`$` prefixes, square-bracket memory references).
 
 ## Open Questions
 

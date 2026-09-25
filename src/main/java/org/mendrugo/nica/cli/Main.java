@@ -18,6 +18,10 @@ import java.nio.file.Path;
  *
  * <p>Usage: {@code nica [options] <assembly-file>}</p>
  *
+ * <p>Only AT&T syntax is supported for x86_64 assembly.
+ * This is the default output format for HotSpot's {@code PrintAssembly}
+ * and {@code perf annotate}.</p>
+ *
  * <p>Options:</p>
  * <ul>
  *   <li>{@code --view cheat-sheet|literal|explained} — output view (default: literal)</li>
@@ -241,8 +245,8 @@ public final class Main {
         out.println("  -o <file>           Write output to file instead of stdout");
         out.println("  --help, -h          Show this help message");
         out.println();
-        out.println("Supported input formats:");
-        out.println("  - HotSpot fast-debug disassembly (x86_64 and aarch64)");
-        out.println("  - perf annotate output (GraalVM native image, x86_64)");
+        out.println("Supported input formats (AT&T syntax only for x86_64):");
+        out.println("  - HotSpot fast-debug disassembly (x86_64 AT&T, aarch64)");
+        out.println("  - perf annotate output (GraalVM native image, x86_64 AT&T)");
     }
 }
