@@ -204,8 +204,8 @@ public final class Main {
     }
 
     private static Architecture parseArch(String s) {
-        return switch (s.toLowerCase().replace('-', '_').replace("_", "")) {
-            case "x8664", "x86_64", "x86", "amd64" -> Architecture.X86_64;
+        return switch (s.toLowerCase()) {
+            case "x86_64", "x86", "amd64" -> Architecture.X86_64;
             case "aarch64", "arm64", "arm" -> Architecture.AARCH64;
             default -> throw new IllegalArgumentException("Unknown architecture: " + s);
         };
