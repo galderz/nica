@@ -122,7 +122,7 @@ cd ../..
 # Rebuild Simple
 cd lib/simple
 mvn install -DskipTests -N
-cd chapter25
+cd chapter14
 mvn install -DskipTests
 cd ../../..
 
