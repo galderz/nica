@@ -151,4 +151,4 @@ See [docs/ideas/nica-assembly-to-java.md](docs/ideas/nica-assembly-to-java.md) f
 
 ## License
 
-TBD
+Apache-2.0
