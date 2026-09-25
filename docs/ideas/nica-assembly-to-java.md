@@ -1,14 +1,14 @@
-# Nica — Assembly-to-Java Translator for JIT Output
+# Nica — Assembly-to-Java Translator for JIT / AOT Output
 
 ## Problem Statement
 
-How might we make disassembled JIT compiler output (HotSpot C2, GraalVM native image)
+How might we make disassembled HotSpot C2 JIT or GraalVM native image AOT compiler output
 immediately comprehensible to Java developers by translating architecture-specific assembly into runnable,
 verified Java code — with multiple levels of abstraction?
 
 ## Recommended Direction
 
-Nica is a **triple-view assembly translator** that takes disassembled x86_64 or aarch64 snippets from JIT compilers
+Nica is a **triple-view assembly translator** that takes disassembled x86_64 or aarch64 snippets from JIT / AOT compilers
 and produces three complementary Java representations:
 
 1. **Cheat Sheet** — the original assembly annotated inline with one-line Java/English comments explaining each instruction.
@@ -37,7 +37,7 @@ Assembly Text → Parser → Arch-Specific Instructions → Simple IR Graph → 
 ```
 
 SIMD operations are modeled as N scalar operations over the Simple IR for the MVP.
-This avoids extending Simple's node system and keeps the IR compatible with Simple's existing debugging tools (IRPrinter).
+This avoids extending Simple's node system and keeps the IR compatible with Simple's existing debugging tools (`IRPrinter`).
 The Explained view is where SIMD gets reconstructed into readable vector operations.
 
 Simple has no published Maven artifacts.
@@ -93,7 +93,7 @@ runs them with 3 different data sets, and asserts array equality.*
   - x86_64: `vmovq`, `vpmovsxbd`, `vpmulld`, `vpaddd`, `vpslld`, `vpsrad`, `vpxor`, `leal`, `cmpl`, `jl`, `leaq`, `cmpq`, `jbe`, `movq`, `movl`, `nop`, `testl`, `je`, `addq`, `retq`, `jle`, `callq`
   - aarch64: `sxtw`, `add`, `ldr`, `sshll`, `mul`, `mla`, `shl`, `sshr`, `eor3`, `cmp`, `b.lt`
 - **Simple IR graph construction** from parsed instructions using chapter 14 nodes
-  (AddNode, MulNode, XorNode, ShlNode, SarNode, ConstantNode, plus custom ParamNode for bindable input parameters)
+  (`AddNode`, `MulNode`, `XorNode`, `ShlNode`, `SarNode`, `ConstantNode`, plus custom `ParamNode` for bindable input parameters)
 - **Three output generators:**
   - Cheat Sheet: annotated assembly (comments only, no transformation)
   - Literal: runnable Java with register-as-variable modeling, SIMD-as-int-array
@@ -171,12 +171,12 @@ Decided: Git submodule. See contribution guide for the workflow.
     Requires mask-and-merge: `rax = (rax & ~0xFFFFL) | (val & 0xFFFFL)`.
   - **8-bit writes** (`movb` to `%al`) **preserve upper bits** — same mask-and-merge pattern.
 
-  **Key observation:** JIT compilers (C2, Graal) almost exclusively emit 32-bit and 64-bit operations.
-All three example snippets confirm this — no 16-bit or 8-bit register writes appear.
-Sub-32-bit partial writes are a handwritten assembly concern, not a JIT output concern.
+  **Key observation:** HotSpot C2 JIT and GraalVM native image AOT compilers almost exclusively emit 32-bit and 64-bit operations.
+    All three example snippets confirm this — no 16-bit or 8-bit register writes appear.
+    Sub-32-bit partial writes are a handwritten assembly concern, not a JIT / AOT output concern.
 
   **Decision: Option B (one `long` variable per physical register, explicit width conversions inline) for MVP.**
-  The 32→64 zero-extension is the only aliasing case that matters for JIT output, and it's handled naturally:
+  The 32→64 zero-extension is the only aliasing case that matters for JIT / AOT output, and it's handled naturally:
     ```java
     // movl 0x4(%rdi), %eax  →  32-bit write zero-extends to 64
     long rax = Integer.toUnsignedLong(memory.loadInt(rdi + 0x4));
@@ -230,7 +230,7 @@ it requires complex static initialization with a full parser/compiler pipeline j
 An initial attempt at Nica-specific IR nodes (records, sealed interfaces) was clean but lost access to Simple's debugging utilities.
 
 Chapter 14 is the sweet spot:
-it is the first chapter with all the node types Nica needs (Add, Mul, Xor, Shl, Sar, Load, If, Loop, Bool, Constant)
+it is the first chapter with all the node types Nica needs (`Add`, `Mul`, `Xor`, `Shl`, `Sar`, `Load`, `If`, `Loop`, `Bool`, `Constant`)
 plus `IRPrinter` for debugging,
 without the `CodeGen` dependency.
 Bootstrap requires just 3 lines:
@@ -328,5 +328,7 @@ Recognizing it in the IR would require modeling control flow (If/Region nodes),
 which the MVP IR builder does not do.
 Instead, `BoundsCheckRecipe` operates directly on the `Instruction` sequence,
 scanning for the `testl`/`je`/`cmpl`/`jb` pattern.
-This pragmatic split — data-flow patterns via IR recipes,
-control-flow patterns via instruction-sequence recipes — works well.
+This pragmatic split —
+data-flow patterns via IR recipes,
+control-flow patterns via instruction-sequence recipes —
+works well.

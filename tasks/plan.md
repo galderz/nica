@@ -2,11 +2,11 @@
 
 ## Overview
 
-Build a CLI tool that translates disassembled JIT compiler output (x86_64 and aarch64) into three complementary Java representations: Cheat Sheet (annotated assembly), Literal (register-level runnable Java), and Explained (pattern-recognized readable Java). Uses Sea of Nodes / Simple IR as an architecture-agnostic pivot between parsing and code generation.
+Build a CLI tool that translates disassembled JIT / AOT compiler output (x86_64 and aarch64) into three complementary Java representations: Cheat Sheet (annotated assembly), Literal (register-level runnable Java), and Explained (pattern-recognized readable Java). Uses Sea of Nodes / Simple IR as an architecture-agnostic pivot between parsing and code generation.
 
 ## Architecture Decisions
 
-- **Simple as Git submodule:** Simple (chapter 25) is added as a Git submodule, built locally via `mvn install`, and consumed as a Maven dependency. CI checks it out and builds it first. The contribution guide documents this workflow step-by-step for developers unfamiliar with submodules.
+- **Simple as Git submodule:** Simple (chapter 14) is added as a Git submodule, built locally via `mvn install`, and consumed as a Maven dependency. CI checks it out and builds it first. The contribution guide documents this workflow step-by-step for developers unfamiliar with submodules.
 - **Java 27 with preview features:** Enables `switch` pattern matching with guards for the recipe/pattern matcher. Maven configured with `--enable-preview`.
 - **Register model — Option B:** One `long` variable per physical register, explicit width conversions inline. Sub-32-bit writes fail hard. Sufficient for JIT output.
 - **SIMD as N scalar operations:** SIMD instructions expand into N scalar Simple IR nodes (e.g., `vpaddd ymm` becomes 8 AddNodes). The Explained view reconstructs the SIMD intent.

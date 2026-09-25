@@ -1,8 +1,10 @@
 # Nica
 
-Assembly-to-Java translator for JIT compiler output.
+Assembly-to-Java translator for JIT / AOT compiler output.
 
-Nica takes disassembled x86_64 or aarch64 assembly from HotSpot C2 and GraalVM native image compilers and translates it into **runnable Java code** with three levels of abstraction:
+Nica takes disassembled x86_64 or aarch64 assembly from HotSpot C2 JIT
+and GraalVM AOT native image compilers
+and translates it into **runnable Java code** with three levels of abstraction:
 
 1. **Cheat Sheet** — annotated assembly with inline comments explaining each instruction
 2. **Literal** — faithful register-level Java (every register is a variable, every SIMD lane is an array element)
@@ -91,7 +93,10 @@ for (int i = 0; i < 8; i++) {
 | HotSpot fast-debug disassembly | x86_64, aarch64 | AT&T | `PrintAssembly` with capstone |
 | `perf annotate` output | x86_64 | AT&T | GraalVM native image |
 
-> **Note:** Only AT&T syntax is supported for x86\_64 assembly. Intel syntax (used by some disassemblers and debuggers) is not supported. AT&T syntax is the default output format for HotSpot's `PrintAssembly` and `perf annotate`, so no configuration is typically needed.
+> **Note:** Only AT&T syntax is supported for x86\_64 assembly.
+> Intel syntax (used by some disassemblers and debuggers) is not supported.
+> AT&T syntax is the default output format for HotSpot's `PrintAssembly` and `perf annotate`,
+> so no configuration is typically needed.
 
 ## Recognized Patterns
 
@@ -107,9 +112,15 @@ The Explained view recognizes these assembly idioms:
 
 The generated Java is a faithful representation of the assembly. Three ways to verify:
 
-1. **Equivalence tests**: The test suite proves Literal and Explained views produce identical results for the same inputs (`EquivalenceTest.java`)
-2. **Run it yourself**: Compile and run the generated Java with known inputs, compare against the actual compiled code's behavior
-3. **Cheat sheet**: Read the annotated assembly instruction-by-instruction and verify each comment matches the instruction's semantics
+1. **Equivalence tests**:
+The test suite proves Literal and Explained views produce identical results for the same inputs
+(`EquivalenceTest.java`)
+2. **Run it yourself**:
+Compile and run the generated Java with known inputs,
+compare against the actual compiled code's behavior
+3. **Cheat sheet**:
+Read the annotated assembly instruction-by-instruction
+and verify each comment matches the instruction's semantics
 
 ## Architecture
 
@@ -121,7 +132,7 @@ Assembly Text → Parser → Instructions → Simple IR Graph → Three Views
 ```
 
 - **Parsers**: `HotSpotDebugParser`, `PerfAnnotateParser`
-- **IR**: Uses [Sea of Nodes / Simple](https://github.com/SeaOfNodes/Simple) chapter 14 nodes (Add, Mul, Xor, Shl, Sar, Constant)
+- **IR**: Uses [Sea of Nodes / Simple](https://github.com/SeaOfNodes/Simple) chapter 14 nodes (`Add`, `Mul`, `Xor`, `Shl`, `Sar`, `Constant`)
 - **Pattern matching**: Java 27 `switch` with type patterns and guards over Simple's Node classes
 - **Code generation**: `LiteralJavaGenerator`, `ExplainedJavaGenerator`, `CheatSheetGenerator`
 
