@@ -45,6 +45,11 @@ public sealed interface Operand {
      * @param displacement signed byte offset
      */
     record Memory(String base, String index, int scale, long displacement) implements Operand {
+        public Memory {
+            // If index is != null, scale must be > 1
+            assert(index != null || scale == 1);
+        }
+
         public Memory(String base, long displacement) {
             this(base, null, 1, displacement);
         }
