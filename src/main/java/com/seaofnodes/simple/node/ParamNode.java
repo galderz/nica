@@ -21,6 +21,11 @@ public class ParamNode extends Node {
     private boolean _bound;
 
     public ParamNode(String name) {
+        // Parser.START may be null at construction time.
+        // Parser.START is a static field on Parser.
+        // If ParamNode is instantiated before a Parser has been set up (e.g., in a unit test that doesn't initialise the Parser),
+        // this passes null to Node(Node...), which Node's constructor may or may not tolerate depending on chapter14's implementation.
+        // ConstantNode itself follows this convention, so it's an existing risk in Simple's API.
         super(Parser.START); // ConstantNode convention: START as input
         _name = name;
         _bound = false;
