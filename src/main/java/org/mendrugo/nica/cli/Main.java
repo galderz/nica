@@ -169,7 +169,7 @@ public final class Main {
     static Format detectFormat(String text) {
         // Perf annotate: has │ (box-drawing character) as column separator
         if (text.contains("│")) return Format.PERF_ANNOTATE;
-        // HotSpot debug: has 0x... addresses with colon
+        // HotSpot debug: has 0x... addresses with colon (weak heuristic but works for now)
         if (text.contains("0x") && text.contains(":")) return Format.HOTSPOT_DEBUG;
         // Default to HotSpot debug
         return Format.HOTSPOT_DEBUG;
