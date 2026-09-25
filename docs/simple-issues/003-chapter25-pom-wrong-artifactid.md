@@ -101,3 +101,7 @@ Expected output:
 ```
 MISMATCH: chapter25/ has artifactId=chapter23
 ```
+
+## PR
+
+A contributor sent a [PR](https://github.com/SeaOfNodes/Simple/pull/252) to fix this.
