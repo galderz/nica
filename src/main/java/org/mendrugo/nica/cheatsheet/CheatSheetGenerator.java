@@ -98,8 +98,13 @@ public final class CheatSheetGenerator {
     }
 
     private static String formatPercent(double pct) {
-        return pct == (int) pct
-            ? String.valueOf((int) pct) + "%"
+        return isWholeNumber(pct)
+            ? (int) pct + "%"
             : String.format("%.2f%%", pct);
+    }
+
+    private static boolean isWholeNumber(double number) {
+        // if the modulus(remainder of the division) of the argument(number) with 1 is 0 then return true otherwise false.
+        return number % 1 == 0;
     }
 }
