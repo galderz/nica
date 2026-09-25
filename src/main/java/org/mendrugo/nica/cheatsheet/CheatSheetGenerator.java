@@ -39,6 +39,7 @@ public final class CheatSheetGenerator {
         // Cap alignment to avoid excessively wide lines
         int alignCol = Math.min(maxLen + 2, 80);
 
+        // A second pass is fine as assembly snippets are expected to be relatively small
         for (var insn : snippet.instructions()) {
             appendAnnotatedInstruction(sb, insn, snippet, alignCol);
         }
